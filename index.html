@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pengganda Teks</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+      font-size: 15px;
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #26a9a3;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #26a9a3;
+    }
+
+    input, select, button {
+      height: 45px;
+      padding: 8px 10px;
+      font-size: 16px;
+      border: 1px solid #26a9a3;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+    }
+
+    .row-inline {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row-inline input[type="number"] {
+      width: 35%;
+    }
+
+    .row-inline select {
+      width: 65%;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #26a9a3;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      flex: 1;
+    }
+
+    button:hover {
+      background-color: #1c8e8a;
+    }
+
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #26a9a3;
+      background: #f0fdfd;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    #salinBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+#salinBtn .icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
+  border-radius: 50%;
+  position: relative;
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+#salinBtn .icon::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#salinBtn.salin-sukses .icon::after {
+  opacity: 1;
+}
+
+#salinBtn.salin-sukses .icon {
+  transform: scale(1.2);
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Pengganda Teks</h2>
+
+    <div class="form-group">
+      <input type="text" id="text" placeholder="Masukkan teks">
+    </div>
+
+    <div class="form-group">
+      <label for="jumlah">Jumlah & Karakter Tak Terlihat:</label>
+      <div class="row-inline">
+        <input type="number" id="jumlah" placeholder="Jumlah" min="1" value="5">
+        <select id="karakter">
+          <option value="">Tidak</option>
+          <option value="\u200B">Zero Width Space (U+200B)</option>
+          <option value="\u200C">Zero Width Non-Joiner (U+200C)</option>
+          <option value="\u200D">Zero Width Joiner (U+200D)</option>
+        </select>
+      </div>
+    </div>
+
+<!-- ... (kode sebelumnya tetap) -->
+
+<div class="button-group">
+  <button onclick="gandakan()">Gandakan</button>
+
+  <div style="display: flex; gap: 10px; flex: 1">
+    <button id="salinBtn" onclick="salin()">
+      <span class="text">Salin</span>
+      <span class="icon"></span>
+    </button>
+    <button onclick="clearOutput()">Clear</button>
+  </div>
+</div>
+
+<!-- ... -->
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    function gandakan() {
+      const text = document.getElementById('text').value;
+      const jumlah = parseInt(document.getElementById('jumlah').value);
+      const invisibleChar = document.getElementById('karakter').value;
+      let result = '';
+
+      for (let i = 0; i < jumlah; i++) {
+        result += text;
+        if (i < jumlah - 1) result += invisibleChar;
+      }
+
+      document.getElementById('output').textContent = result;
+    }
+
+function salin() {
+  const output = document.getElementById('output');
+  const text = output.textContent.trim();
+
+  // Cek jika output kosong
+  if (!text) {
+    alert("⚠️ Tidak ada teks untuk disalin!");
+    return;
+  }
+
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(output);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand("copy");
+
+  const btn = document.getElementById('salinBtn');
+  btn.classList.add("salin-sukses");
+  btn.querySelector(".text").textContent = "Disalin!";
+
+  // Reset tampilan tombol setelah 2 detik
+  setTimeout(() => {
+    btn.classList.remove("salin-sukses");
+    btn.querySelector(".text").textContent = "Salin";
+  }, 2000);
+}
+
+function clearOutput() {
+  const output = document.getElementById('output');
+  const textInput = document.getElementById('text');
+  const btn = document.getElementById('salinBtn');
+
+  // Kosongkan area output dan input
+  output.textContent = '';
+  textInput.value = '';
+
+  // Reset tampilan tombol salin
+  btn.classList.remove("salin-sukses");
+  btn.querySelector(".text").textContent = "Salin";
+}
+
+  </script>
+
+</body>
+</html>
